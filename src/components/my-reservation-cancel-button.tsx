@@ -2,11 +2,17 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import AdminConfirmModal from "@/components/admin-confirm-modal";
+
+type ReservationStatus =
+  | "PENDING"
+  | "CONFIRMED"
+  | "PICKED_UP"
+  | "RETURNED"
+  | "CANCELED";
 
 type Props = {
   reservationId: string;
-  status: "PENDING" | "CONFIRMED" | "CANCELED";
+  status: ReservationStatus;
 };
 
 export default function MyReservationCancelButton({
@@ -15,68 +21,51 @@ export default function MyReservationCancelButton({
 }: Props) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [open, setOpen] = useState(false);
 
-  async function cancelReservationConfirmed() {
+  const canCancel = status === "PENDING" || status === "CONFIRMED";
+
+  if (!canCancel) {
+    return null;
+  }
+
+  async function handleCancel() {
+    const confirmed = window.confirm(
+      "Opravdu chcete tuto rezervaci zrušit?"
+    );
+
+    if (!confirmed) return;
+
+    setLoading(true);
+
     try {
-      setLoading(true);
-      setError("");
-
-      const res = await fetch(`/api/my-reservations/${reservationId}/cancel`, {
+      const res = await fetch(`/api/moje-rezervace/${reservationId}/cancel`, {
         method: "PATCH",
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => null);
 
       if (!res.ok) {
-        setError(data?.error ?? "Rezervaci se nepodařilo zrušit.");
+        alert(data?.error || "Zrušení rezervace se nepodařilo.");
         return;
       }
 
-      setOpen(false);
       router.refresh();
-    } catch {
-      setError("Došlo k chybě při rušení rezervace.");
+    } catch (error) {
+      console.error("MY_RESERVATION_CANCEL_ERROR", error);
+      alert("Došlo k chybě při zrušení rezervace.");
     } finally {
       setLoading(false);
     }
   }
 
-  if (!["PENDING", "CONFIRMED"].includes(status)) {
-    return null;
-  }
-
   return (
-    <>
-      <div className="mt-6">
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          disabled={loading}
-          className="rounded-2xl border border-red-300 bg-white px-4 py-2 text-sm font-medium text-red-700 transition hover:bg-red-50 disabled:opacity-60"
-        >
-          {loading ? "Ruším..." : "Zrušit rezervaci"}
-        </button>
-
-        {error && (
-          <div className="mt-3 rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">
-            {error}
-          </div>
-        )}
-      </div>
-
-      <AdminConfirmModal
-        open={open}
-        title="Zrušit rezervaci"
-        description="Opravdu chcete zrušit tuto rezervaci?"
-        confirmLabel="Ano, zrušit"
-        cancelLabel="Zpět"
-        danger
-        loading={loading}
-        onConfirm={cancelReservationConfirmed}
-        onCancel={() => !loading && setOpen(false)}
-      />
-    </>
+    <button
+      type="button"
+      onClick={handleCancel}
+      disabled={loading}
+      className="inline-flex items-center justify-center rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-700 transition hover:bg-red-100 disabled:opacity-60"
+    >
+      {loading ? "Ruším..." : "Zrušit rezervaci"}
+    </button>
   );
 }
