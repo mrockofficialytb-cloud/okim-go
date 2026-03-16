@@ -37,7 +37,8 @@ type MobileVariantItem = {
   transmission: string;
   fuel: string;
   seats: number;
-  pricePerDay: number;
+  pricePerDayShort: number;
+  pricePerDayLong: number;
   days: MobileDayItem[];
 };
 
@@ -113,7 +114,8 @@ export default function AdminCalendarMobileAccordion({ variants }: Props) {
                 </div>
 
                 <div className="mt-1 text-xs text-neutral-500">
-                  {variant.pricePerDay} Kč / den
+                  1–7 dní: {variant.pricePerDayShort} Kč • 8–30 dní:{" "}
+                  {variant.pricePerDayLong} Kč
                 </div>
               </div>
 
