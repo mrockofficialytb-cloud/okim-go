@@ -1,26 +1,257 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f5f5f5;
+  --foreground: #111827;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--background);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Základní kontrast */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: #111827;
+}
+
+p,
+span,
+label,
+div,
+td,
+th {
+  color: inherit;
+}
+
+input,
+textarea,
+select {
+  color: #111827;
+  background: #ffffff;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #6b7280;
+  opacity: 1;
+}
+
+/* Admin clean overrides */
+main .text-neutral-500 {
+  color: #4b5563 !important;
+}
+
+main .text-neutral-600 {
+  color: #374151 !important;
+}
+
+main .text-neutral-700 {
+  color: #1f2937 !important;
+}
+
+main .border-neutral-200 {
+  border-color: #d1d5db !important;
+}
+
+main .border-neutral-300 {
+  border-color: #cbd5e1 !important;
+}
+
+main .bg-neutral-50 {
+  background-color: #f9fafb !important;
+}
+
+main .bg-neutral-100 {
+  background-color: #f3f4f6 !important;
+}
+
+main input,
+main textarea,
+main select {
+  color: #111827 !important;
+  background: #ffffff !important;
+}
+
+main input::placeholder,
+main textarea::placeholder {
+  color: #6b7280 !important;
+  opacity: 1 !important;
+}
+
+/* Reusable admin look */
+.admin-page-title {
+  color: #111827;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.admin-page-subtitle {
+  color: #4b5563;
+}
+
+.admin-card {
+  background: #ffffff;
+  border: 1px solid #dbe1e8;
+  border-radius: 24px;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+}
+
+.admin-section {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 22px;
+}
+
+.admin-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.admin-input {
+  height: 44px;
+  width: 100%;
+  border-radius: 16px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  padding: 0 1rem;
+  font-size: 0.875rem;
+  color: #111827;
+  outline: none;
+  transition: 0.15s ease;
+}
+
+.admin-input:focus {
+  border-color: #111827;
+  box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.08);
+}
+
+.admin-input::placeholder {
+  color: #6b7280;
+  opacity: 1;
+}
+
+.admin-btn-dark {
+  border-radius: 16px;
+  background: #111827;
+  color: #ffffff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.75rem 1.25rem;
+  transition: 0.15s ease;
+}
+
+.admin-btn-dark:hover {
+  background: #0b1220;
+}
+
+.admin-btn-outline {
+  border-radius: 16px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #111827;
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.75rem 1rem;
+  transition: 0.15s ease;
+}
+
+.admin-btn-outline:hover {
+  background: #f8fafc;
+}
+
+.admin-btn-danger {
+  border-radius: 16px;
+  border: 1px solid #fca5a5;
+  background: #ffffff;
+  color: #b91c1c;
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.75rem 1rem;
+  transition: 0.15s ease;
+}
+
+.admin-btn-danger:hover {
+  background: #fef2f2;
+}
+
+.admin-badge-success {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  background: #dcfce7;
+  color: #166534;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.admin-badge-danger {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  background: #fee2e2;
+  color: #b91c1c;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.admin-badge-warning {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  background: #fef3c7;
+  color: #92400e;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.admin-section {
+  @apply rounded-3xl border border-neutral-200 bg-white p-4 shadow-sm sm:p-5 lg:p-6;
+}
+
+.admin-grid-2 {
+  @apply grid gap-4 md:grid-cols-2;
+}
+
+.admin-grid-3 {
+  @apply grid gap-4 md:grid-cols-2 xl:grid-cols-3;
+}
+
+.admin-grid-4 {
+  @apply grid gap-4 sm:grid-cols-2 xl:grid-cols-4;
+}
+
+.admin-actions {
+  @apply flex flex-col gap-3 sm:flex-row sm:flex-wrap;
+}
+
+.admin-input {
+  @apply h-12 w-full rounded-2xl border border-neutral-300 px-4 text-sm outline-none focus:border-neutral-900;
+}
+
+.admin-textarea {
+  @apply w-full rounded-2xl border border-neutral-300 px-4 py-3 text-sm outline-none focus:border-neutral-900;
+}
+
+.admin-select {
+  @apply h-12 w-full rounded-2xl border border-neutral-300 bg-white px-4 text-sm outline-none focus:border-neutral-900;
+}
+
+.admin-button-row {
+  @apply flex flex-col gap-3 sm:flex-row sm:flex-wrap;
 }
