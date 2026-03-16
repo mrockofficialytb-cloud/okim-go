@@ -66,11 +66,11 @@ export async function GET(_req: Request, { params }: Props) {
       : null,
   });
 
-  return new NextResponse(pdfBytes, {
+  return new NextResponse(Buffer.from(pdfBytes), {
     status: 200,
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": `inline; filename="potvrzeni-rezervace-${reservation.id}.pdf"`,
+      "Content-Disposition": `inline; filename="rezervace-${reservation.id}.pdf"`,
     },
   });
 }
