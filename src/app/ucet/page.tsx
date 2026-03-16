@@ -5,19 +5,33 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-function statusLabel(status: "PENDING" | "CONFIRMED" | "CANCELED") {
+function statusLabel(
+  status: "PENDING" | "CONFIRMED" | "PICKED_UP" | "RETURNED" | "CANCELED"
+) {
   if (status === "PENDING") return "Čeká na schválení";
   if (status === "CONFIRMED") return "Potvrzeno";
+  if (status === "PICKED_UP") return "Půjčeno";
+  if (status === "RETURNED") return "Dokončeno";
   return "Zrušeno";
 }
 
-function statusClasses(status: "PENDING" | "CONFIRMED" | "CANCELED") {
+function statusClasses(
+  status: "PENDING" | "CONFIRMED" | "PICKED_UP" | "RETURNED" | "CANCELED"
+) {
   if (status === "PENDING") {
     return "inline-flex items-center rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-800";
   }
 
   if (status === "CONFIRMED") {
     return "inline-flex items-center rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-800";
+  }
+
+  if (status === "PICKED_UP") {
+    return "inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-800";
+  }
+
+  if (status === "RETURNED") {
+    return "inline-flex items-center rounded-full bg-neutral-200 px-3 py-1 text-xs font-medium text-neutral-800";
   }
 
   return "inline-flex items-center rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-700";
@@ -121,100 +135,98 @@ export default async function AccountPage() {
         </div>
 
         <div className="grid gap-6 xl:grid-cols-[1.25fr_0.75fr]">
-          {/* LEVÁ HLAVNÍ ČÁST */}
           <div className="space-y-6">
-            {/* PROFIL KARTA */}
             <section className="overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-black/5">
-           <div
-  className="bg-gradient-to-r from-neutral-950 via-neutral-900 to-neutral-800 px-6 py-6"
-  style={{ color: "#f5f5f5" }}
->
-  <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-    <div className="flex items-center gap-4">
-      <div
-        className="flex h-16 w-16 items-center justify-center rounded-full ring-1"
-        style={{
-          background: "rgba(255,255,255,0.08)",
-          color: "#ffffff",
-          borderColor: "rgba(255,255,255,0.12)",
-        }}
-      >
-        <span className="text-xl font-semibold">{initials}</span>
-      </div>
+              <div
+                className="bg-gradient-to-r from-neutral-950 via-neutral-900 to-neutral-800 px-6 py-6"
+                style={{ color: "#f5f5f5" }}
+              >
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                  <div className="flex items-center gap-4">
+                    <div
+                      className="flex h-16 w-16 items-center justify-center rounded-full ring-1"
+                      style={{
+                        background: "rgba(255,255,255,0.08)",
+                        color: "#ffffff",
+                        borderColor: "rgba(255,255,255,0.12)",
+                      }}
+                    >
+                      <span className="text-xl font-semibold">{initials}</span>
+                    </div>
 
-      <div>
-        <div
-          className="text-2xl font-semibold"
-          style={{ color: "#ffffff" }}
-        >
-          {user.name || "Uživatel"}
-        </div>
+                    <div>
+                      <div
+                        className="text-2xl font-semibold"
+                        style={{ color: "#ffffff" }}
+                      >
+                        {user.name || "Uživatel"}
+                      </div>
 
-        <div
-          className="mt-1 text-sm"
-          style={{ color: "#d4d4d8" }}
-        >
-          {user.email}
-        </div>
+                      <div
+                        className="mt-1 text-sm"
+                        style={{ color: "#d4d4d8" }}
+                      >
+                        {user.email}
+                      </div>
 
-        <div
-          className="mt-2 inline-flex items-center gap-2 text-sm"
-          style={{ color: "#34d399" }}
-        >
-          <span
-            className="h-2 w-2 rounded-full"
-            style={{ backgroundColor: "#34d399" }}
-          />
-          {user.emailVerified ? "Email ověřen" : "Email neověřen"}
-        </div>
-      </div>
-    </div>
+                      <div
+                        className="mt-2 inline-flex items-center gap-2 text-sm"
+                        style={{ color: "#34d399" }}
+                      >
+                        <span
+                          className="h-2 w-2 rounded-full"
+                          style={{ backgroundColor: "#34d399" }}
+                        />
+                        {user.emailVerified ? "Email ověřen" : "Email neověřen"}
+                      </div>
+                    </div>
+                  </div>
 
-    <div className="grid grid-cols-2 gap-3 md:min-w-[280px]">
-      <div
-        className="rounded-2xl px-4 py-3 ring-1"
-        style={{
-          background: "rgba(255,255,255,0.05)",
-          borderColor: "rgba(255,255,255,0.10)",
-        }}
-      >
-        <div
-          className="text-xs uppercase tracking-[0.18em]"
-          style={{ color: "#d4d4d8" }}
-        >
-          Rezervace celkem
-        </div>
-        <div
-          className="mt-2 text-2xl font-semibold"
-          style={{ color: "#ffffff" }}
-        >
-          {totalReservations}
-        </div>
-      </div>
+                  <div className="grid grid-cols-2 gap-3 md:min-w-[280px]">
+                    <div
+                      className="rounded-2xl px-4 py-3 ring-1"
+                      style={{
+                        background: "rgba(255,255,255,0.05)",
+                        borderColor: "rgba(255,255,255,0.10)",
+                      }}
+                    >
+                      <div
+                        className="text-xs uppercase tracking-[0.18em]"
+                        style={{ color: "#d4d4d8" }}
+                      >
+                        Rezervace celkem
+                      </div>
+                      <div
+                        className="mt-2 text-2xl font-semibold"
+                        style={{ color: "#ffffff" }}
+                      >
+                        {totalReservations}
+                      </div>
+                    </div>
 
-      <div
-        className="rounded-2xl px-4 py-3 ring-1"
-        style={{
-          background: "rgba(255,255,255,0.05)",
-          borderColor: "rgba(255,255,255,0.10)",
-        }}
-      >
-        <div
-          className="text-xs uppercase tracking-[0.18em]"
-          style={{ color: "#d4d4d8" }}
-        >
-          Aktivní
-        </div>
-        <div
-          className="mt-2 text-2xl font-semibold"
-          style={{ color: "#ffffff" }}
-        >
-          {activeReservations}
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+                    <div
+                      className="rounded-2xl px-4 py-3 ring-1"
+                      style={{
+                        background: "rgba(255,255,255,0.05)",
+                        borderColor: "rgba(255,255,255,0.10)",
+                      }}
+                    >
+                      <div
+                        className="text-xs uppercase tracking-[0.18em]"
+                        style={{ color: "#d4d4d8" }}
+                      >
+                        Aktivní
+                      </div>
+                      <div
+                        className="mt-2 text-2xl font-semibold"
+                        style={{ color: "#ffffff" }}
+                      >
+                        {activeReservations}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
               <div className="grid gap-4 px-6 py-6 md:grid-cols-3">
                 <div className="rounded-2xl bg-neutral-50 px-4 py-4">
@@ -246,7 +258,6 @@ export default async function AccountPage() {
               </div>
             </section>
 
-            {/* RYCHLÉ AKCE */}
             <section className="grid gap-4 md:grid-cols-3">
               <Link
                 href="/moje-rezervace"
@@ -326,7 +337,6 @@ export default async function AccountPage() {
               </Link>
             </section>
 
-            {/* POSLEDNÍ REZERVACE */}
             <section className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/5">
               <div className="flex items-center justify-between gap-4">
                 <div>
@@ -389,9 +399,7 @@ export default async function AccountPage() {
             </section>
           </div>
 
-          {/* PRAVÝ SIDEBAR */}
           <div className="space-y-6">
-            {/* STAV PROFILU */}
             <section className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/5">
               <h2 className="text-xl font-semibold text-neutral-950">
                 Stav profilu řidiče
@@ -419,7 +427,13 @@ export default async function AccountPage() {
               <div className="mt-5 space-y-3 text-sm">
                 <div className="flex items-center justify-between">
                   <span className="text-neutral-600">Jméno a příjmení</span>
-                  <span className={user.firstName && user.lastName ? "text-emerald-600" : "text-red-600"}>
+                  <span
+                    className={
+                      user.firstName && user.lastName
+                        ? "text-emerald-600"
+                        : "text-red-600"
+                    }
+                  >
                     {user.firstName && user.lastName ? "Vyplněno" : "Chybí"}
                   </span>
                 </div>
@@ -448,7 +462,11 @@ export default async function AccountPage() {
 
                 <div className="flex items-center justify-between">
                   <span className="text-neutral-600">Doklad totožnosti</span>
-                  <span className={user.idDocumentNumber ? "text-emerald-600" : "text-red-600"}>
+                  <span
+                    className={
+                      user.idDocumentNumber ? "text-emerald-600" : "text-red-600"
+                    }
+                  >
                     {user.idDocumentNumber ? "Vyplněno" : "Chybí"}
                   </span>
                 </div>
@@ -477,7 +495,6 @@ export default async function AccountPage() {
               </Link>
             </section>
 
-            {/* RYCHLÉ INFO */}
             <section className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/5">
               <h2 className="text-xl font-semibold text-neutral-950">
                 Důležité informace
