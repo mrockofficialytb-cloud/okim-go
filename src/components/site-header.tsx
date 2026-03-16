@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { auth } from "@/auth";
 import UserMenu from "@/components/user-menu";
+import Image from "next/image";
 
 export default async function SiteHeader() {
   const session = await auth();
@@ -9,12 +10,15 @@ export default async function SiteHeader() {
   return (
     <header className="relative z-40 bg-[#171717] px-4 py-4 text-white sm:px-6">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <Link
-          href="/"
-          className="text-2xl font-bold tracking-tight text-white"
-        >
-          OKIM GO
-        </Link>
+       <Link href="/" className="flex items-center">
+  <Image
+    src="/logo-okim.svg"
+    alt="OKIM GO"
+    width={160}
+    height={36}
+    priority
+  />
+</Link>
 
         <div className="flex flex-wrap items-center gap-2 sm:gap-3 lg:justify-end">
           {!user ? (
