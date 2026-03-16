@@ -54,11 +54,8 @@ export async function GET(_req: Request, { params }: Props) {
     pickupMileage: reservation.pickupMileage,
     pickupFuel: reservation.pickupFuel,
     pickupNote: reservation.pickupNote,
-
-    // DŮLEŽITÉ: podpisy pro admin náhled / stažení
     pickupOwnerSignature: reservation.pickupOwnerSignature,
     pickupCustomerSignature: reservation.pickupCustomerSignature,
-
     car: {
       brand: reservation.carVariant.carModel.brand,
       model: reservation.carVariant.carModel.model,
@@ -79,7 +76,7 @@ export async function GET(_req: Request, { params }: Props) {
       : null,
   });
 
-  return new NextResponse(pdfBytes, {
+  return new NextResponse(Buffer.from(pdfBytes), {
     status: 200,
     headers: {
       "Content-Type": "application/pdf",
