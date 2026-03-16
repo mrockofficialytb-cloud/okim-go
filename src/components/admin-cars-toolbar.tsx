@@ -1,7 +1,12 @@
-import Link from "next/link";
+"use client";
+
+import { useState } from "react";
 import AdminNav from "@/components/admin-nav";
+import AdminCreateCarForm from "@/components/admin-create-car-form";
 
 export default function AdminCarsToolbar() {
+  const [open, setOpen] = useState(false);
+
   return (
     <div className="mt-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
@@ -11,28 +16,19 @@ export default function AdminCarsToolbar() {
 
         <div className="w-full lg:flex-1">
           <div className="flex justify-start lg:justify-end">
-            <Link
-              href="/admin/cars/new"
-              aria-label="Přidat vozidlo"
-              className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-black text-white shadow-sm transition hover:bg-neutral-800"
+            <button
+              type="button"
+              onClick={() => setOpen(!open)}
+              aria-label={open ? "Zavřít formulář" : "Přidat vozidlo"}
+              className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-[#171717] text-white shadow-sm transition hover:bg-neutral-800"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M12 5v14" />
-                <path d="M5 12h14" />
-              </svg>
-            </Link>
+              <span className="text-2xl leading-none">{open ? "−" : "+"}</span>
+            </button>
           </div>
         </div>
       </div>
+
+      {open && <AdminCreateCarForm />}
     </div>
   );
 }
