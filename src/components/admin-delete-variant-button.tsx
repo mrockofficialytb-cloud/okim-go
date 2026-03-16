@@ -71,15 +71,7 @@ export default function AdminDeleteVariantButton({
       <AdminConfirmModal
         open={open}
         title="Smazat variantu"
-        description={
-  <>
-    Opravdu chcete odstranit variantu{" "}
-    <strong className="font-semibold text-neutral-900">{variantName}</strong>{" "}
-    u modelu{" "}
-    <strong className="font-semibold text-neutral-900">{modelName}</strong>? 
-    Tato akce je nevratná.
-  </>
-}
+        description={`Opravdu chcete odstranit variantu "${variantName}" u modelu "${modelName}"? Tato akce je nevratná.`}
         confirmLabel="Ano, smazat"
         danger
         onConfirm={removeConfirmed}
