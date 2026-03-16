@@ -1,9 +1,9 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, Suspense, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
-export default function ResetPasswordPage() {
+function ResetPasswordPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const token = searchParams.get("token") || "";
@@ -103,5 +103,24 @@ export default function ResetPasswordPage() {
         </form>
       </div>
     </main>
+  );
+}
+
+function ResetPasswordFallback() {
+  return (
+    <main className="min-h-screen bg-neutral-100 px-6 py-10">
+      <div className="mx-auto max-w-md rounded-3xl bg-white p-8 shadow-sm ring-1 ring-black/5">
+        <h1 className="text-3xl font-semibold tracking-tight">Nové heslo</h1>
+        <p className="mt-2 text-sm text-neutral-600">Načítám…</p>
+      </div>
+    </main>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<ResetPasswordFallback />}>
+      <ResetPasswordPageContent />
+    </Suspense>
   );
 }

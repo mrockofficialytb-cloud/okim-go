@@ -1,14 +1,15 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, Suspense, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function LoginPage() {
+function LoginPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const callbackUrl = searchParams.get("callbackUrl") || "/";
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -46,6 +47,7 @@ export default function LoginPage() {
     <main className="min-h-screen bg-neutral-100 px-6 py-10">
       <div className="mx-auto max-w-md rounded-3xl bg-white p-8 shadow-sm ring-1 ring-black/5">
         <h1 className="text-3xl font-semibold tracking-tight">Přihlášení</h1>
+
         <p className="mt-2 text-sm text-neutral-600">
           Přihlaste se do svého účtu.
         </p>
@@ -84,22 +86,43 @@ export default function LoginPage() {
           >
             {loading ? "Přihlašuji..." : "Přihlásit se"}
           </button>
-		  <div className="mt-4 text-center">
-  <a
-    href="/zapomenute-heslo"
-    className="text-sm font-medium text-neutral-700 underline underline-offset-4 hover:text-neutral-900"
-  >
-    Zapomněli jste heslo?
-  </a>
-</div>
-<div className="mt-3 text-center text-sm text-neutral-600">
-  Nemáte účet?{" "}
-  <a href="/registrace" className="font-medium text-neutral-900 underline">
-    Registrujte se
-  </a>
-</div>
+
+          <div className="mt-4 text-center">
+            <a
+              href="/zapomenute-heslo"
+              className="text-sm font-medium text-neutral-700 underline underline-offset-4 hover:text-neutral-900"
+            >
+              Zapomněli jste heslo?
+            </a>
+          </div>
+
+          <div className="mt-3 text-center text-sm text-neutral-600">
+            Nemáte účet?{" "}
+            <a href="/registrace" className="font-medium text-neutral-900 underline">
+              Registrujte se
+            </a>
+          </div>
         </form>
       </div>
     </main>
+  );
+}
+
+function LoginFallback() {
+  return (
+    <main className="min-h-screen bg-neutral-100 px-6 py-10">
+      <div className="mx-auto max-w-md rounded-3xl bg-white p-8 shadow-sm ring-1 ring-black/5">
+        <h1 className="text-3xl font-semibold tracking-tight">Přihlášení</h1>
+        <p className="mt-2 text-sm text-neutral-600">Načítám…</p>
+      </div>
+    </main>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<LoginFallback />}>
+      <LoginPageContent />
+    </Suspense>
   );
 }
