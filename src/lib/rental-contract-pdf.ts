@@ -1,6 +1,8 @@
-import { PDFDocument, rgb } from "pdf-lib";
+import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
 import { readFile } from "fs/promises";
+import fs from "fs";
+import path from "path";
 
 type RentalContractPdfData = {
   id: string;
@@ -49,6 +51,30 @@ function formatDateTime(value?: Date | string | null) {
 function formatCurrency(value?: number | string | null) {
   if (value == null || value === "") return "—";
   return `${new Intl.NumberFormat("cs-CZ").format(Number(value))} Kč`;
+}
+
+async function loadPdfFonts(pdfDoc: PDFDocument) {
+  pdfDoc.registerFontkit(fontkit);
+
+  const regularPath = path.join(process.cwd(), "public", "fonts", "arial.ttf");
+  const boldPath = path.join(process.cwd(), "public", "fonts", "arial-bold.ttf");
+
+  const hasCustomFonts = fs.existsSync(regularPath) && fs.existsSync(boldPath);
+
+  if (hasCustomFonts) {
+    const regularFontBytes = await readFile(regularPath);
+    const boldFontBytes = await readFile(boldPath);
+
+    const font = await pdfDoc.embedFont(regularFontBytes);
+    const boldFont = await pdfDoc.embedFont(boldFontBytes);
+
+    return { font, boldFont };
+  }
+
+  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+
+  return { font, boldFont };
 }
 
 function fitText(font: any, text: string, maxWidth: number, startSize: number, minSize = 7) {
@@ -273,13 +299,7 @@ function dataUrlToUint8Array(dataUrl?: string | null) {
 
 export async function generateRentalContractPdf(data: RentalContractPdfData) {
   const pdfDoc = await PDFDocument.create();
-  pdfDoc.registerFontkit(fontkit);
-
-  const regularFontBytes = await readFile("C:/Windows/Fonts/arial.ttf");
-  const boldFontBytes = await readFile("C:/Windows/Fonts/arialbd.ttf");
-
-  const font = await pdfDoc.embedFont(regularFontBytes);
-  const boldFont = await pdfDoc.embedFont(boldFontBytes);
+  const { font, boldFont } = await loadPdfFonts(pdfDoc);
 
   let ownerSignatureImage: any = null;
   let customerSignatureImage: any = null;
@@ -653,12 +673,9 @@ Tato smlouva představuje úplnou dohodu mezi stranami ohledně nájmu vozidla. 
     y2 -= 36;
   }
 
-  
-
   const signatureLineY = y2 - 12;
   const labelY = y2 - 54;
 
-  // levá strana - nájemce
   pageRef.page.drawLine({
     start: { x: margin + 10, y: signatureLineY },
     end: { x: margin + 210, y: signatureLineY },
@@ -666,7 +683,6 @@ Tato smlouva představuje úplnou dohodu mezi stranami ohledně nájmu vozidla. 
     color: rgb(0.75, 0.75, 0.75),
   });
 
-  // pravá strana - pronajímatel
   pageRef.page.drawLine({
     start: { x: 330, y: signatureLineY },
     end: { x: 530, y: signatureLineY },

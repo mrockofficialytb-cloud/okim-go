@@ -1,6 +1,8 @@
-import { PDFDocument, rgb } from "pdf-lib";
+import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
 import { readFile } from "fs/promises";
+import fs from "fs";
+import path from "path";
 
 type ReservationPdfData = {
   id: string;
@@ -49,6 +51,30 @@ function formatCurrency(value?: number | string | null) {
 
 function formatTime(value?: string | null) {
   return value?.trim() || "—";
+}
+
+async function loadPdfFonts(pdfDoc: PDFDocument) {
+  pdfDoc.registerFontkit(fontkit);
+
+  const regularPath = path.join(process.cwd(), "public", "fonts", "arial.ttf");
+  const boldPath = path.join(process.cwd(), "public", "fonts", "arial-bold.ttf");
+
+  const hasCustomFonts = fs.existsSync(regularPath) && fs.existsSync(boldPath);
+
+  if (hasCustomFonts) {
+    const regularFontBytes = await readFile(regularPath);
+    const boldFontBytes = await readFile(boldPath);
+
+    const font = await pdfDoc.embedFont(regularFontBytes);
+    const boldFont = await pdfDoc.embedFont(boldFontBytes);
+
+    return { font, boldFont };
+  }
+
+  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+
+  return { font, boldFont };
 }
 
 function fitText(
@@ -263,13 +289,7 @@ function drawWrappedBlock(
 
 export async function generateReservationPdf(data: ReservationPdfData) {
   const pdfDoc = await PDFDocument.create();
-  pdfDoc.registerFontkit(fontkit);
-
-  const regularFontBytes = await readFile("C:/Windows/Fonts/arial.ttf");
-  const boldFontBytes = await readFile("C:/Windows/Fonts/arialbd.ttf");
-
-  const font = await pdfDoc.embedFont(regularFontBytes);
-  const boldFont = await pdfDoc.embedFont(boldFontBytes);
+  const { font, boldFont } = await loadPdfFonts(pdfDoc);
 
   const page1 = pdfDoc.addPage([595.28, 841.89]);
   const { width, height } = page1.getSize();
@@ -578,9 +598,6 @@ Tento dokument slouží jako potvrzení rezervace a přehled důležitých infor
   y2 -= 28;
 
   drawDivider(page2, margin, width - margin, y2);
-
- 
-   
 
   drawText(page2, "Podpis pronajímatele", 330, y2 - 42, {
     size: 10,
