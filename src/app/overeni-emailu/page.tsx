@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { FormEvent, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -56,6 +58,7 @@ export default function VerifyEmailPage() {
       }
 
       setSuccess("Email byl ověřen. Za chvíli budete přesměrováni.");
+
       setTimeout(() => {
         router.push("/");
         router.refresh();
@@ -111,7 +114,9 @@ export default function VerifyEmailPage() {
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div>
-            <label className="mb-2 block text-sm font-medium">Ověřovací kód</label>
+            <label className="mb-2 block text-sm font-medium">
+              Ověřovací kód
+            </label>
             <input
               value={code}
               onChange={(e) => setCode(e.target.value)}
