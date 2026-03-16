@@ -1,12 +1,10 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
-import { FormEvent, useState } from "react";
+import { FormEvent, Suspense, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function VerifyEmailPage() {
+function VerifyEmailPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -180,5 +178,24 @@ export default function VerifyEmailPage() {
         </form>
       </div>
     </main>
+  );
+}
+
+function VerifyEmailFallback() {
+  return (
+    <main className="min-h-screen bg-neutral-100 px-6 py-10">
+      <div className="mx-auto max-w-md rounded-3xl bg-white p-8 shadow-sm ring-1 ring-black/5">
+        <h1 className="text-3xl font-semibold tracking-tight">Ověření emailu</h1>
+        <p className="mt-2 text-sm text-neutral-600">Načítám ověřovací stránku…</p>
+      </div>
+    </main>
+  );
+}
+
+export default function VerifyEmailPage() {
+  return (
+    <Suspense fallback={<VerifyEmailFallback />}>
+      <VerifyEmailPageContent />
+    </Suspense>
   );
 }
