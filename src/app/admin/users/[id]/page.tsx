@@ -13,15 +13,23 @@ type Props = {
   }>;
 };
 
-function statusLabel(status: "PENDING" | "CONFIRMED" | "CANCELED") {
+function statusLabel(
+  status: "PENDING" | "CONFIRMED" | "PICKED_UP" | "RETURNED" | "CANCELED"
+) {
   if (status === "PENDING") return "Čeká na schválení";
   if (status === "CONFIRMED") return "Schváleno";
+  if (status === "PICKED_UP") return "Půjčeno";
+  if (status === "RETURNED") return "Dokončeno";
   return "Zrušeno";
 }
 
-function statusClasses(status: "PENDING" | "CONFIRMED" | "CANCELED") {
+function statusClasses(
+  status: "PENDING" | "CONFIRMED" | "PICKED_UP" | "RETURNED" | "CANCELED"
+) {
   if (status === "PENDING") return "admin-badge-warning";
   if (status === "CONFIRMED") return "admin-badge-success";
+  if (status === "PICKED_UP") return "bg-blue-100 text-blue-800";
+  if (status === "RETURNED") return "bg-neutral-200 text-neutral-800";
   return "admin-badge-danger";
 }
 
@@ -264,107 +272,105 @@ export default async function AdminUserDetailPage({ params }: Props) {
               </div>
             )}
 
-           {user.reservations.map((r) => (
-  <div key={r.id} className="admin-card p-6">
-    <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-      <div>
-        <h3 className="text-xl font-semibold">
-          {r.carVariant.carModel.brand} {r.carVariant.carModel.model}
-        </h3>
-        <p className="mt-1 text-sm text-neutral-600">
-          Varianta: {r.carVariant.name}
-        </p>
-        <p className="mt-1 text-sm text-neutral-600">
-          Termín: {formatDate(r.dateFrom)} – {formatDate(r.dateTo)}
-        </p>
-      </div>
+            {user.reservations.map((r) => (
+              <div key={r.id} className="admin-card p-6">
+                <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                  <div>
+                    <h3 className="text-xl font-semibold">
+                      {r.carVariant.carModel.brand} {r.carVariant.carModel.model}
+                    </h3>
+                    <p className="mt-1 text-sm text-neutral-600">
+                      Varianta: {r.carVariant.name}
+                    </p>
+                    <p className="mt-1 text-sm text-neutral-600">
+                      Termín: {formatDate(r.dateFrom)} – {formatDate(r.dateTo)}
+                    </p>
+                  </div>
 
-      <div className={statusClasses(r.status)}>{statusLabel(r.status)}</div>
-    </div>
+                  <div className={statusClasses(r.status)}>{statusLabel(r.status)}</div>
+                </div>
 
-    <div className="mt-6 grid gap-6 lg:grid-cols-2">
-      <div className="space-y-4 rounded-2xl border border-neutral-200/80 bg-white p-4">
-        <div className="grid grid-cols-[160px_1fr] items-start gap-2 border-b border-neutral-100 pb-3">
-          <div className="text-sm text-neutral-500">Zákazník:</div>
-          <div className="font-semibold text-neutral-900">{r.customerName}</div>
-        </div>
+                <div className="mt-6 grid gap-6 lg:grid-cols-2">
+                  <div className="space-y-4 rounded-2xl border border-neutral-200/80 bg-white p-4">
+                    <div className="grid grid-cols-[160px_1fr] items-start gap-2 border-b border-neutral-100 pb-3">
+                      <div className="text-sm text-neutral-500">Zákazník:</div>
+                      <div className="font-semibold text-neutral-900">{r.customerName}</div>
+                    </div>
 
-        <div className="grid grid-cols-[160px_1fr] items-start gap-2 border-b border-neutral-100 pb-3">
-          <div className="text-sm text-neutral-500">Email:</div>
-          <div className="break-all font-semibold text-neutral-900">{r.email}</div>
-        </div>
+                    <div className="grid grid-cols-[160px_1fr] items-start gap-2 border-b border-neutral-100 pb-3">
+                      <div className="text-sm text-neutral-500">Email:</div>
+                      <div className="break-all font-semibold text-neutral-900">{r.email}</div>
+                    </div>
 
-        <div className="grid grid-cols-[160px_1fr] items-start gap-2 border-b border-neutral-100 pb-3">
-          <div className="text-sm text-neutral-500">Telefon:</div>
-          <div className="font-semibold text-neutral-900">{r.phone}</div>
-        </div>
+                    <div className="grid grid-cols-[160px_1fr] items-start gap-2 border-b border-neutral-100 pb-3">
+                      <div className="text-sm text-neutral-500">Telefon:</div>
+                      <div className="font-semibold text-neutral-900">{r.phone}</div>
+                    </div>
 
-        <div className="grid grid-cols-[160px_1fr] items-start gap-2">
-          <div className="text-sm text-neutral-500">Délka pronájmu:</div>
-          <div className="font-semibold text-neutral-900">
-            {rentalDays(r.dateFrom, r.dateTo)} dní
-          </div>
-        </div>
-      </div>
+                    <div className="grid grid-cols-[160px_1fr] items-start gap-2">
+                      <div className="text-sm text-neutral-500">Délka pronájmu:</div>
+                      <div className="font-semibold text-neutral-900">
+                        {rentalDays(r.dateFrom, r.dateTo)} dní
+                      </div>
+                    </div>
+                  </div>
 
-      <div className="space-y-4 rounded-2xl border border-neutral-200/80 bg-white p-4">
-        <div className="grid grid-cols-[160px_1fr] items-start gap-2 border-b border-neutral-100 pb-3">
-          <div className="text-sm text-neutral-500">Cena:</div>
-          <div className="font-semibold text-neutral-900">{r.totalPrice} Kč</div>
-        </div>
+                  <div className="space-y-4 rounded-2xl border border-neutral-200/80 bg-white p-4">
+                    <div className="grid grid-cols-[160px_1fr] items-start gap-2 border-b border-neutral-100 pb-3">
+                      <div className="text-sm text-neutral-500">Cena:</div>
+                      <div className="font-semibold text-neutral-900">{r.totalPrice} Kč</div>
+                    </div>
 
-        <div className="grid grid-cols-[160px_1fr] items-start gap-2 border-b border-neutral-100 pb-3">
-          <div className="text-sm text-neutral-500">Kauce:</div>
-          <div className="font-semibold text-neutral-900">
-            {r.depositAmount != null ? `${r.depositAmount} Kč` : "—"}
-          </div>
-        </div>
+                    <div className="grid grid-cols-[160px_1fr] items-start gap-2 border-b border-neutral-100 pb-3">
+                      <div className="text-sm text-neutral-500">Kauce:</div>
+                      <div className="font-semibold text-neutral-900">
+                        {r.depositAmount != null ? `${r.depositAmount} Kč` : "—"}
+                      </div>
+                    </div>
 
-        <div className="grid grid-cols-[160px_1fr] items-start gap-2 border-b border-neutral-100 pb-3">
-          <div className="text-sm text-neutral-500">Stav kauce:</div>
-          <div className="font-semibold text-neutral-900">
-            {r.depositStatus === "UNPAID"
-              ? "Nezaplacena"
-              : r.depositStatus === "PAID"
-              ? "Zaplacena"
-              : r.depositStatus === "RETURNED"
-              ? "Vrácena"
-              : "—"}
-          </div>
-        </div>
+                    <div className="grid grid-cols-[160px_1fr] items-start gap-2 border-b border-neutral-100 pb-3">
+                      <div className="text-sm text-neutral-500">Stav kauce:</div>
+                      <div className="font-semibold text-neutral-900">
+                        {r.depositStatus === "UNPAID"
+                          ? "Nezaplacena"
+                          : r.depositStatus === "PAID"
+                          ? "Zaplacena"
+                          : r.depositStatus === "RETURNED"
+                          ? "Vrácena"
+                          : "—"}
+                      </div>
+                    </div>
 
-        <div className="grid grid-cols-[160px_1fr] items-start gap-2">
-          <div className="text-sm text-neutral-500">Vytvořeno:</div>
-          <div className="font-semibold text-neutral-900">
-            {formatDateTime(r.createdAt)}
-          </div>
-        </div>
-      </div>
-    </div>
+                    <div className="grid grid-cols-[160px_1fr] items-start gap-2">
+                      <div className="text-sm text-neutral-500">Vytvořeno:</div>
+                      <div className="font-semibold text-neutral-900">
+                        {formatDateTime(r.createdAt)}
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
-    <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="text-sm text-neutral-700">
-          
-        </div>
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <div className="text-sm text-neutral-700"></div>
 
-        <Link
-          href={`/admin/reservations/${r.id}`}
-          className="rounded-xl border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-800 transition hover:bg-neutral-50"
-        >
-          Detail rezervace
-        </Link>
-      </div>
+                    <Link
+                      href={`/admin/reservations/${r.id}`}
+                      className="rounded-xl border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-800 transition hover:bg-neutral-50"
+                    >
+                      Detail rezervace
+                    </Link>
+                  </div>
 
-      <div className="text-sm text-neutral-500">
-        Zpracoval:{" "}
-        <span className="font-medium text-neutral-900">
-          {session.user.name}
-        </span>
-      </div>
-    </div>
-  </div>
-))}
+                  <div className="text-sm text-neutral-500">
+                    Zpracoval:{" "}
+                    <span className="font-medium text-neutral-900">
+                      {session.user.name}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
