@@ -151,7 +151,8 @@ export default async function AdminCalendarPage({
     transmission: variant.transmission,
     fuel: variant.fuel,
     seats: variant.seats,
-    pricePerDay: variant.pricePerDay,
+    pricePerDayShort: variant.pricePerDayShort,
+    pricePerDayLong: variant.pricePerDayLong,
     days: days.map((day) => {
       const currentDay = startOfDay(day);
 
@@ -267,12 +268,10 @@ export default async function AdminCalendarPage({
           </div>
         </div>
 
-        {/* MOBILE / TABLET ACCORDION */}
         <div className="mt-6 xl:hidden">
           <AdminCalendarMobileAccordion variants={mobileVariants} />
         </div>
 
-        {/* DESKTOP TABLE */}
         <div className="mt-6 hidden overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-sm xl:block">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[1200px] table-fixed border-separate border-spacing-0">
@@ -323,7 +322,8 @@ export default async function AdminCalendarPage({
                         {variant.transmission} • {variant.fuel} • {variant.seats} míst
                       </div>
                       <div className="mt-1 text-xs text-neutral-500">
-                        {variant.pricePerDay} Kč / den
+                        1–7 dní: {variant.pricePerDayShort} Kč • 8–30 dní:{" "}
+                        {variant.pricePerDayLong} Kč
                       </div>
                     </td>
 
