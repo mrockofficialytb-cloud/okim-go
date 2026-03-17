@@ -27,9 +27,9 @@ export default async function AdminUsersPage() {
     redirect("/prihlaseni?callbackUrl=/admin/users");
   }
 
-  if (session.user.role !== "ADMIN") {
-    redirect("/");
-  }
+  if (!["ADMIN", "STAFF"].includes(session.user.role ?? "")) {
+  redirect("/");
+}
 
   const users = await prisma.user.findMany({
     include: {

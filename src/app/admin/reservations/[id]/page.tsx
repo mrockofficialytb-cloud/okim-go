@@ -55,9 +55,9 @@ export default async function AdminReservationDetailPage({ params }: Props) {
     redirect("/prihlaseni?callbackUrl=/admin");
   }
 
-  if (session.user.role !== "ADMIN") {
-    redirect("/");
-  }
+  if (!["ADMIN", "STAFF"].includes(session.user.role ?? "")) {
+  redirect("/");
+}
 
   const { id } = await params;
 

@@ -24,9 +24,9 @@ export default async function AdminReservationsPage() {
     redirect("/prihlaseni?callbackUrl=/admin/reservations");
   }
 
-  if (session.user.role !== "ADMIN") {
-    redirect("/");
-  }
+  if (!["ADMIN", "STAFF"].includes(session.user.role ?? "")) {
+  redirect("/");
+}
 
   const reservations = await prisma.reservation.findMany({
     include: {

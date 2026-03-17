@@ -10,9 +10,9 @@ export default async function NewCarPage() {
     redirect("/prihlaseni?callbackUrl=/admin/cars/new");
   }
 
-  if (session.user.role !== "ADMIN") {
-    redirect("/");
-  }
+  if (!["ADMIN", "STAFF"].includes(session.user.role ?? "")) {
+  redirect("/");
+}
 
   return (
     <main className="min-h-screen bg-neutral-100 px-4 py-8 sm:px-6 lg:px-8">

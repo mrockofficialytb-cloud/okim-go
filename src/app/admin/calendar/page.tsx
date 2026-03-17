@@ -80,9 +80,9 @@ export default async function AdminCalendarPage({
     redirect("/prihlaseni?callbackUrl=/admin/calendar");
   }
 
-  if (session.user.role !== "ADMIN") {
-    redirect("/");
-  }
+  if (!["ADMIN", "STAFF"].includes(session.user.role ?? "")) {
+  redirect("/");
+}
 
   const params = await searchParams;
   const weekStart = normalizeWeekStart(params?.weekStart);
