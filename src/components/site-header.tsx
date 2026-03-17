@@ -48,7 +48,12 @@ export default async function SiteHeader() {
 
               <UserMenu
                 name={user.name || user.email || "Uživatel"}
-                role={user.role}
+                role={
+                  (user.role === "STAFF" ? "ADMIN" : user.role) as
+                    | "USER"
+                    | "ADMIN"
+                    | undefined
+                }
               />
 
               {(user.role === "ADMIN" || user.role === "STAFF") && (
