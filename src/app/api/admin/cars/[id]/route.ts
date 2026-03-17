@@ -10,10 +10,10 @@ type Params = {
 };
 
 const patchSchema = z.object({
-  brand: z.string().min(1, "Zadejte značku."),
-  model: z.string().min(1, "Zadejte model."),
-  slug: z.string().min(1, "Zadejte slug."),
   active: z.boolean(),
+  brand: z.string().min(1, "Zadejte značku.").optional(),
+  model: z.string().min(1, "Zadejte model.").optional(),
+  slug: z.string().min(1, "Zadejte slug.").optional(),
   image: z.string().nullable().optional(),
 });
 
@@ -53,10 +53,21 @@ export async function PATCH(req: Request, { params }: Params) {
     };
 
     if (isAdmin) {
-      updateData.brand = data.brand;
-      updateData.model = data.model;
-      updateData.slug = data.slug;
-      updateData.image = data.image?.trim() ? data.image.trim() : null;
+      if (typeof data.brand === "string") {
+        updateData.brand = data.brand;
+      }
+
+      if (typeof data.model === "string") {
+        updateData.model = data.model;
+      }
+
+      if (typeof data.slug === "string") {
+        updateData.slug = data.slug;
+      }
+
+      if ("image" in data) {
+        updateData.image = data.image?.trim() ? data.image.trim() : null;
+      }
     }
 
     const updated = await prisma.carModel.update({
