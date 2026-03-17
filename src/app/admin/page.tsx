@@ -53,9 +53,9 @@ export default async function AdminDashboardPage() {
     redirect("/prihlaseni?callbackUrl=/admin");
   }
 
-  if (session.user.role !== "ADMIN") {
-    redirect("/");
-  }
+ if (!["ADMIN", "STAFF"].includes(session.user.role ?? "")) {
+  redirect("/");
+}
 
   const now = new Date();
   const todayStart = startOfDay(now);
