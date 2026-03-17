@@ -26,11 +26,14 @@ function statusLabel(
 function statusClasses(
   status: "PENDING" | "CONFIRMED" | "PICKED_UP" | "RETURNED" | "CANCELED"
 ) {
-  if (status === "PENDING") return "admin-badge-warning";
-  if (status === "CONFIRMED") return "admin-badge-success";
-  if (status === "PICKED_UP") return "bg-blue-100 text-blue-800";
-  if (status === "RETURNED") return "bg-neutral-200 text-neutral-800";
-  return "admin-badge-danger";
+  const base =
+    "inline-flex items-center rounded-full px-3 py-1 text-sm font-medium";
+
+  if (status === "PENDING") return `${base} bg-amber-100 text-amber-800`;
+  if (status === "CONFIRMED") return `${base} bg-emerald-100 text-emerald-800`;
+  if (status === "PICKED_UP") return `${base} bg-blue-100 text-blue-800`;
+  if (status === "RETURNED") return `${base} bg-neutral-200 text-neutral-800`;
+  return `${base} bg-red-100 text-red-800`;
 }
 
 function formatDate(value?: Date | null) {
@@ -291,7 +294,9 @@ export default async function AdminUserDetailPage({ params }: Props) {
                     </p>
                   </div>
 
-                  <div className={statusClasses(r.status)}>{statusLabel(r.status)}</div>
+                  <div className={statusClasses(r.status)}>
+                    {statusLabel(r.status)}
+                  </div>
                 </div>
 
                 <div className="mt-6 grid gap-6 lg:grid-cols-2">
