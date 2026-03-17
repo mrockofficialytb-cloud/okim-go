@@ -1,15 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
 import AdminNav from "@/components/admin-nav";
 import AdminCreateCarForm from "@/components/admin-create-car-form";
 
-export default function AdminCarsToolbar() {
-  const [open, setOpen] = useState(false);
-  const { data: session } = useSession();
+type Props = {
+  currentUserRole?: "USER" | "STAFF" | "ADMIN";
+};
 
-  const isAdmin = session?.user?.role === "ADMIN";
+export default function AdminCarsToolbar({ currentUserRole }: Props) {
+  const [open, setOpen] = useState(false);
+
+  const isAdmin = currentUserRole === "ADMIN";
 
   return (
     <div className="mt-6">

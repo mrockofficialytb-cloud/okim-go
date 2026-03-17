@@ -49,7 +49,7 @@ export default async function AdminCarsPage() {
         </p>
 
         <div className="mt-6">
-          <AdminCarsToolbar />
+          <AdminCarsToolbar currentUserRole={session.user.role} />
         </div>
 
         <div className="mt-8 space-y-6">
