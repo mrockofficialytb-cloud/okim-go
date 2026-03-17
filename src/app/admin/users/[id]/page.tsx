@@ -57,7 +57,7 @@ export default async function AdminUserDetailPage({ params }: Props) {
     redirect("/prihlaseni");
   }
 
-  if (session.user.role !== "ADMIN") {
+  if (!["ADMIN", "STAFF"].includes(session.user.role ?? "")) {
     redirect("/");
   }
 
@@ -251,7 +251,11 @@ export default async function AdminUserDetailPage({ params }: Props) {
         </div>
 
         <div className="mt-6">
-          <AdminUserNoteForm userId={user.id} notes={user.adminNotes} />
+          <AdminUserNoteForm
+            userId={user.id}
+            notes={user.adminNotes}
+            currentUserRole={session.user.role}
+          />
         </div>
 
         <div className="mt-8">
@@ -352,8 +356,6 @@ export default async function AdminUserDetailPage({ params }: Props) {
 
                 <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
                   <div className="flex flex-wrap items-center gap-3">
-                    <div className="text-sm text-neutral-700"></div>
-
                     <Link
                       href={`/admin/reservations/${r.id}`}
                       className="rounded-xl border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-800 transition hover:bg-neutral-50"

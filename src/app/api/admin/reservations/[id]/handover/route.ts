@@ -23,7 +23,7 @@ const schema = z.object({
 export async function PATCH(req: Request, { params }: Params) {
   const session = await auth();
 
-  if (!session?.user || session.user.role !== "ADMIN") {
+  if (!session?.user || !["ADMIN", "STAFF"].includes(session.user.role ?? "")) {
     return NextResponse.json({ error: "Nemáte oprávnění." }, { status: 403 });
   }
 
@@ -105,6 +105,8 @@ export async function PATCH(req: Request, { params }: Params) {
         },
       });
 
+      let emailWarning = false;
+
       try {
         const pdf = await generateRentalContractPdf({
           id: updated.id,
@@ -171,16 +173,14 @@ export async function PATCH(req: Request, { params }: Params) {
         });
       } catch (err) {
         console.error("EMAIL_RENTAL_CONTRACT_ERROR", err);
-        return NextResponse.json(
-          {
-            error:
-              "Předání bylo uloženo, ale odeslání emailu se nepodařilo. Zkontrolujte server log.",
-          },
-          { status: 500 }
-        );
+        emailWarning = true;
       }
 
-      return NextResponse.json({ success: true, reservation: updated });
+      return NextResponse.json({
+        success: true,
+        reservation: updated,
+        emailWarning,
+      });
     }
 
     if (type === "return") {

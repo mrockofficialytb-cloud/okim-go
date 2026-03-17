@@ -201,9 +201,9 @@ export default async function AdminDashboardPage() {
 
   const stats = [
     {
-      title: "Rezervace dnes",
+      title: "Vytvořené rezervace",
       value: reservationsToday,
-      hint: "Nově vytvořené rezervace za dnešek",
+      hint: "Celkový počet vytvořených rezervací",
     },
     {
       title: "Aktivní pronájmy",

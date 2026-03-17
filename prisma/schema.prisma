@@ -17,6 +17,7 @@ enum ReservationStatus {
 
 enum UserRole {
   USER
+  STAFF
   ADMIN
 }
 

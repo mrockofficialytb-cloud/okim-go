@@ -17,7 +17,7 @@ const schema = z.object({
 export async function PATCH(req: Request, { params }: Params) {
   const session = await auth();
 
-  if (!session?.user || session.user.role !== "ADMIN") {
+  if (!session?.user || !["ADMIN", "STAFF"].includes(session.user.role ?? "")) {
     return NextResponse.json({ error: "Nemáte oprávnění." }, { status: 403 });
   }
 

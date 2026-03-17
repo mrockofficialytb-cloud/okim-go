@@ -17,7 +17,7 @@ type Params = {
 export async function PATCH(req: Request, { params }: Params) {
   const session = await auth();
 
-  if (!session?.user || session.user.role !== "ADMIN") {
+  if (!session?.user || !["ADMIN", "STAFF"].includes(session.user.role ?? "")) {
     return NextResponse.json({ error: "Nemáte oprávnění." }, { status: 403 });
   }
 
@@ -49,73 +49,88 @@ export async function PATCH(req: Request, { params }: Params) {
     const formattedDateFrom = new Date(reservation.dateFrom).toLocaleDateString("cs-CZ");
     const formattedDateTo = new Date(reservation.dateTo).toLocaleDateString("cs-CZ");
 
-    if (status === "CONFIRMED") {
-      const pdfBytes = await generateReservationPdf({
-        id: reservation.id,
-        customerName: reservation.customerName,
-        email: reservation.email,
-        phone: reservation.phone,
-        totalPrice: reservation.totalPrice,
-        depositAmount: reservation.depositAmount,
-        dateFrom: reservation.dateFrom,
-        dateTo: reservation.dateTo,
-        createdAt: reservation.createdAt,
-        car: {
-          brand: reservation.carVariant.carModel.brand,
-          model: reservation.carVariant.carModel.model,
-          variant: reservation.carVariant.name,
-        },
-        user: reservation.user
-          ? {
-              firstName: reservation.user.firstName,
-              lastName: reservation.user.lastName,
-              dateOfBirth: reservation.user.dateOfBirth,
-              addressStreet: reservation.user.addressStreet,
-              addressCity: reservation.user.addressCity,
-              addressZip: reservation.user.addressZip,
-              idDocumentNumber: reservation.user.idDocumentNumber,
-              driverLicenseNumber: reservation.user.driverLicenseNumber,
-              driverLicenseExpiry: reservation.user.driverLicenseExpiry,
-            }
-          : null,
-      });
+    let emailWarning = false;
 
-      await sendEmail({
-        to: reservation.email,
-        subject: "Rezervace potvrzena – OKIM GO",
-        html: reservationConfirmedTemplate({
+    if (status === "CONFIRMED") {
+      try {
+        const pdfBytes = await generateReservationPdf({
+          id: reservation.id,
           customerName: reservation.customerName,
-          carName,
-          dateFrom: formattedDateFrom,
-          dateTo: formattedDateTo,
+          email: reservation.email,
+          phone: reservation.phone,
           totalPrice: reservation.totalPrice,
-        }),
-        attachments: [
-          {
-            filename: `potvrzeni-rezervace-${reservation.id}.pdf`,
-            content: Buffer.from(pdfBytes),
-            contentType: "application/pdf",
+          depositAmount: reservation.depositAmount,
+          dateFrom: reservation.dateFrom,
+          dateTo: reservation.dateTo,
+          createdAt: reservation.createdAt,
+          pickupTimePlanned: reservation.pickupTimePlanned,
+          returnTimePlanned: reservation.returnTimePlanned,
+          car: {
+            brand: reservation.carVariant.carModel.brand,
+            model: reservation.carVariant.carModel.model,
+            variant: reservation.carVariant.name,
           },
-        ],
-      });
+          user: reservation.user
+            ? {
+                firstName: reservation.user.firstName,
+                lastName: reservation.user.lastName,
+                dateOfBirth: reservation.user.dateOfBirth,
+                addressStreet: reservation.user.addressStreet,
+                addressCity: reservation.user.addressCity,
+                addressZip: reservation.user.addressZip,
+                idDocumentNumber: reservation.user.idDocumentNumber,
+                driverLicenseNumber: reservation.user.driverLicenseNumber,
+                driverLicenseExpiry: reservation.user.driverLicenseExpiry,
+              }
+            : null,
+        });
+
+        await sendEmail({
+          to: reservation.email,
+          subject: "Rezervace potvrzena – OKIM GO",
+          html: reservationConfirmedTemplate({
+            customerName: reservation.customerName,
+            carName,
+            dateFrom: formattedDateFrom,
+            dateTo: formattedDateTo,
+            totalPrice: reservation.totalPrice,
+          }),
+          attachments: [
+            {
+              filename: `potvrzeni-rezervace-${reservation.id}.pdf`,
+              content: Buffer.from(pdfBytes),
+              contentType: "application/pdf",
+            },
+          ],
+        });
+      } catch (error) {
+        console.error("ADMIN_RESERVATION_CONFIRM_EMAIL_ERROR", error);
+        emailWarning = true;
+      }
     }
 
     if (status === "CANCELED") {
-      await sendEmail({
-        to: reservation.email,
-        subject: "Rezervace byla zrušena – OKIM GO",
-        html: reservationCanceledTemplate({
-          customerName: reservation.customerName,
-          carName,
-          dateFrom: formattedDateFrom,
-          dateTo: formattedDateTo,
-        }),
-      });
+      try {
+        await sendEmail({
+          to: reservation.email,
+          subject: "Rezervace byla zrušena – OKIM GO",
+          html: reservationCanceledTemplate({
+            customerName: reservation.customerName,
+            carName,
+            dateFrom: formattedDateFrom,
+            dateTo: formattedDateTo,
+          }),
+        });
+      } catch (error) {
+        console.error("ADMIN_RESERVATION_CANCEL_EMAIL_ERROR", error);
+        emailWarning = true;
+      }
     }
 
     return NextResponse.json({
       success: true,
       reservation,
+      emailWarning,
     });
   } catch (error) {
     console.error("ADMIN_RESERVATION_PATCH_ERROR", error);

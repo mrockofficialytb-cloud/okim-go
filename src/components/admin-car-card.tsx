@@ -42,10 +42,12 @@ type CarItem = {
 
 type Props = {
   car: CarItem;
+  currentUserRole?: "USER" | "STAFF" | "ADMIN";
 };
 
-export default function AdminCarCard({ car }: Props) {
+export default function AdminCarCard({ car, currentUserRole }: Props) {
   const router = useRouter();
+  const isAdmin = currentUserRole === "ADMIN";
 
   const [editing, setEditing] = useState(false);
   const [brand, setBrand] = useState(car.brand);
@@ -120,6 +122,7 @@ export default function AdminCarCard({ car }: Props) {
                   value={brand}
                   onChange={(e) => setBrand(e.target.value)}
                   className="admin-input"
+                  disabled={!isAdmin}
                 />
               </div>
 
@@ -129,6 +132,7 @@ export default function AdminCarCard({ car }: Props) {
                   value={model}
                   onChange={(e) => setModel(e.target.value)}
                   className="admin-input"
+                  disabled={!isAdmin}
                 />
               </div>
 
@@ -138,6 +142,7 @@ export default function AdminCarCard({ car }: Props) {
                   value={slug}
                   onChange={(e) => setSlug(e.target.value)}
                   className="admin-input"
+                  disabled={!isAdmin}
                 />
               </div>
             </div>
@@ -157,33 +162,37 @@ export default function AdminCarCard({ car }: Props) {
             active={car.active}
           />
 
-          <AdminDeleteCarButton
-            carId={car.id}
-            carName={`${car.brand} ${car.model}`}
-          />
+          {isAdmin && (
+            <AdminDeleteCarButton
+              carId={car.id}
+              carName={`${car.brand} ${car.model}`}
+            />
+          )}
 
           <div className="flex flex-wrap items-center justify-end gap-3">
             {!editing ? (
-              <button
-                type="button"
-                onClick={() => setEditing(true)}
-                className="inline-flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+              isAdmin ? (
+                <button
+                  type="button"
+                  onClick={() => setEditing(true)}
+                  className="inline-flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
                 >
-                  <path d="M12 20h9" />
-                  <path d="M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" />
-                </svg>
-                Upravit
-              </button>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M12 20h9" />
+                    <path d="M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" />
+                  </svg>
+                  Upravit
+                </button>
+              ) : null
             ) : (
               <>
                 <button
@@ -269,14 +278,16 @@ export default function AdminCarCard({ car }: Props) {
                         onClick={() => setOpenVariant(variant.id)}
                         className="admin-btn-outline"
                       >
-                        Upravit variantu
+                        {isAdmin ? "Upravit variantu" : "Dostupnost varianty"}
                       </button>
 
-                      <AdminDeleteVariantButton
-                        variantId={variant.id}
-                        variantName={variant.name}
-						modelName={`${car.brand} ${car.model}`}
-                      />
+                      {isAdmin && (
+                        <AdminDeleteVariantButton
+                          variantId={variant.id}
+                          variantName={variant.name}
+                          modelName={`${car.brand} ${car.model}`}
+                        />
+                      )}
                     </div>
                   </div>
                 )}
@@ -285,7 +296,7 @@ export default function AdminCarCard({ car }: Props) {
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div className="text-sm font-semibold text-neutral-900">
-                        Upravit variantu
+                        {isAdmin ? "Upravit variantu" : "Dostupnost varianty"}
                       </div>
 
                       <button
@@ -297,26 +308,30 @@ export default function AdminCarCard({ car }: Props) {
                       </button>
                     </div>
 
-                    <AdminCarVariantForm
-                      variant={{
-                        id: variant.id,
-                        name: variant.name,
-                        transmission: variant.transmission,
-                        fuel: variant.fuel,
-                        seats: variant.seats,
-                        pricePerDayShort: variant.pricePerDayShort,
-                        pricePerDayLong: variant.pricePerDayLong,
-                        quantity: variant.quantity,
-                        image: variant.image,
-                        active: variant.active,
-                      }}
-                    />
+                    {isAdmin && (
+                      <>
+                        <AdminCarVariantForm
+                          variant={{
+                            id: variant.id,
+                            name: variant.name,
+                            transmission: variant.transmission,
+                            fuel: variant.fuel,
+                            seats: variant.seats,
+                            pricePerDayShort: variant.pricePerDayShort,
+                            pricePerDayLong: variant.pricePerDayLong,
+                            quantity: variant.quantity,
+                            image: variant.image,
+                            active: variant.active,
+                          }}
+                        />
 
-                    <AdminDeleteVariantButton
-                      variantId={variant.id}
-                      variantName={variant.name}
-					  modelName={`${car.brand} ${car.model}`}
-                    />
+                        <AdminDeleteVariantButton
+                          variantId={variant.id}
+                          variantName={variant.name}
+                          modelName={`${car.brand} ${car.model}`}
+                        />
+                      </>
+                    )}
 
                     <AdminBlockedPeriodForm carVariantId={variant.id} />
 
@@ -364,7 +379,7 @@ export default function AdminCarCard({ car }: Props) {
           })}
         </div>
 
-        {showCreateVariant && (
+        {isAdmin && showCreateVariant && (
           <div className="mt-6">
             <AdminCreateVariantPanel
               carModelId={car.id}
@@ -373,15 +388,17 @@ export default function AdminCarCard({ car }: Props) {
           </div>
         )}
 
-        <div className="mt-6 flex flex-wrap gap-3">
-          <button
-            type="button"
-            onClick={() => setShowCreateVariant((prev) => !prev)}
-            className="rounded-xl border border-neutral-300 bg-white px-4 py-2 text-sm font-medium hover:bg-neutral-50"
-          >
-            {showCreateVariant ? "Skrýt přidání varianty" : "+ Přidat variantu"}
-          </button>
-        </div>
+        {isAdmin && (
+          <div className="mt-6 flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={() => setShowCreateVariant((prev) => !prev)}
+              className="rounded-xl border border-neutral-300 bg-white px-4 py-2 text-sm font-medium hover:bg-neutral-50"
+            >
+              {showCreateVariant ? "Skrýt přidání varianty" : "+ Přidat variantu"}
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );

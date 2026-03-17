@@ -13,10 +13,17 @@ type NoteItem = {
 type Props = {
   userId: string;
   notes: NoteItem[];
+  currentUserRole?: "USER" | "STAFF" | "ADMIN";
 };
 
-export default function AdminUserNoteForm({ userId, notes }: Props) {
+export default function AdminUserNoteForm({
+  userId,
+  notes,
+  currentUserRole,
+}: Props) {
   const router = useRouter();
+  const isAdmin = currentUserRole === "ADMIN";
+
   const [value, setValue] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
@@ -84,7 +91,7 @@ export default function AdminUserNoteForm({ userId, notes }: Props) {
             Interní poznámka zákazníka
           </h2>
           <p className="mt-1 text-sm text-neutral-600">
-            Interní historie poznámek viditelná pouze administrátorům.
+            Interní historie poznámek viditelná pouze administrátorům a zaměstnancům.
           </p>
         </div>
       </div>
@@ -153,10 +160,12 @@ export default function AdminUserNoteForm({ userId, notes }: Props) {
                   </div>
                 </div>
 
-                <AdminDeleteUserNoteButton
-                  noteId={item.id}
-                  label={item.note.length > 120 ? `${item.note.slice(0, 120)}…` : item.note}
-                />
+                {isAdmin && (
+                  <AdminDeleteUserNoteButton
+                    noteId={item.id}
+                    label={item.note.length > 120 ? `${item.note.slice(0, 120)}…` : item.note}
+                  />
+                )}
               </div>
             </div>
           ))}

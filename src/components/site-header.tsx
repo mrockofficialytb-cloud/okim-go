@@ -10,15 +10,15 @@ export default async function SiteHeader() {
   return (
     <header className="relative z-40 bg-[#171717] px-4 py-4 text-white sm:px-6">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-       <Link href="/" className="flex items-center">
-  <Image
-    src="/logo-okim.svg"
-    alt="OKIM GO"
-    width={160}
-    height={36}
-    priority
-  />
-</Link>
+        <Link href="/" className="flex items-center">
+          <Image
+            src="/logo-okim.svg"
+            alt="OKIM GO"
+            width={160}
+            height={36}
+            priority
+          />
+        </Link>
 
         <div className="flex flex-wrap items-center gap-2 sm:gap-3 lg:justify-end">
           {!user ? (
@@ -51,7 +51,7 @@ export default async function SiteHeader() {
                 role={user.role}
               />
 
-              {user.role === "ADMIN" && (
+              {(user.role === "ADMIN" || user.role === "STAFF") && (
                 <Link
                   href="/admin"
                   className="flex h-12 items-center gap-2 rounded-2xl border border-white/20 px-4 text-sm font-medium text-white transition hover:border-white/40 hover:bg-white/5 sm:h-14 sm:px-5"

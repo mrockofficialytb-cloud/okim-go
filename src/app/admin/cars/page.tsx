@@ -3,7 +3,6 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import AdminCarCard from "@/components/admin-car-card";
 import AdminCarsToolbar from "@/components/admin-cars-toolbar";
-import AdminCreateCarForm from "@/components/admin-create-car-form";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +13,7 @@ export default async function AdminCarsPage() {
     redirect("/prihlaseni?callbackUrl=/admin/cars");
   }
 
-  if (session.user.role !== "ADMIN") {
+  if (!["ADMIN", "STAFF"].includes(session.user.role ?? "")) {
     redirect("/");
   }
 
@@ -41,7 +40,6 @@ export default async function AdminCarsPage() {
   return (
     <main className="min-h-screen bg-neutral-100 px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
-
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
           Vozidla
         </h1>
@@ -50,14 +48,11 @@ export default async function AdminCarsPage() {
           Správa modelů, variant, cen, obrázků, blokací a dostupných kusů.
         </p>
 
-        {/* toolbar */}
         <div className="mt-6">
-  <AdminCarsToolbar />  
-</div>
+          <AdminCarsToolbar />
+        </div>
 
-        {/* cars list */}
         <div className="mt-8 space-y-6">
-
           {cars.length === 0 && (
             <div className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/5">
               Žádná vozidla.
@@ -67,6 +62,7 @@ export default async function AdminCarsPage() {
           {cars.map((car) => (
             <AdminCarCard
               key={car.id}
+              currentUserRole={session.user.role}
               car={{
                 id: car.id,
                 brand: car.brand,
@@ -94,7 +90,6 @@ export default async function AdminCarsPage() {
               }}
             />
           ))}
-
         </div>
       </div>
     </main>

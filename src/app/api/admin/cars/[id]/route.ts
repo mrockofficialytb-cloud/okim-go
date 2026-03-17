@@ -20,7 +20,7 @@ const patchSchema = z.object({
 export async function PATCH(req: Request, { params }: Params) {
   const session = await auth();
 
-  if (!session?.user || session.user.role !== "ADMIN") {
+  if (!session?.user || !["ADMIN", "STAFF"].includes(session.user.role ?? "")) {
     return NextResponse.json({ error: "Nemáte oprávnění." }, { status: 403 });
   }
 
@@ -40,16 +40,28 @@ export async function PATCH(req: Request, { params }: Params) {
     }
 
     const data = parsed.data;
+    const isAdmin = session.user.role === "ADMIN";
+
+    const updateData: {
+      active: boolean;
+      brand?: string;
+      model?: string;
+      slug?: string;
+      image?: string | null;
+    } = {
+      active: data.active,
+    };
+
+    if (isAdmin) {
+      updateData.brand = data.brand;
+      updateData.model = data.model;
+      updateData.slug = data.slug;
+      updateData.image = data.image?.trim() ? data.image.trim() : null;
+    }
 
     const updated = await prisma.carModel.update({
       where: { id },
-      data: {
-        brand: data.brand,
-        model: data.model,
-        slug: data.slug,
-        active: data.active,
-        image: data.image?.trim() ? data.image.trim() : null,
-      },
+      data: updateData,
     });
 
     return NextResponse.json({
